@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de Marca de Agua</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tipografía Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Librerías para procesamiento 100% local en el navegador -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Barras de desplazamiento discretas para paneles internos */
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col">
+
+  <!-- Input de archivos oculto fuera de cualquier contenedor conflictivo para clic 100% fiable -->
+  <input type="file" id="pdf-input" accept=".pdf,application/pdf" multiple class="hidden" />
+  <input type="file" id="import-json-input" accept=".json,application/json" class="hidden" />
+
+  <!-- Encabezado compacto -->
+  <header class="bg-white border-b border-slate-200 shrink-0 z-20">
+    <div class="max-w-[1600px] mx-auto px-4 lg:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-blue-700 text-white p-2 rounded-xl shadow-xs shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Generador de Marca de Agua</h1>
+          <p class="text-[11px] text-slate-500 hidden sm:block">Personalización confidencial de documentos PDF por destinatario</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-2.5 py-1 rounded-lg text-[11px] font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>Procesamiento 100% local en tu navegador</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notificaciones flotantes -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-2rem)] pointer-events-none"></div>
+
+  <!-- Área principal de 3 columnas en pantalla completa (100vh en escritorio sin scroll global) -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 lg:p-4 lg:min-h-0">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:h-full">
+
+      <!-- COLUMNA 1 (4/12): Documentos PDF + Ajustes de Formato -->
+      <div class="lg:col-span-4 flex flex-col gap-3.5 lg:h-full lg:min-h-0">
+
+        <!-- Tarjeta 1: Carga múltiple de PDFs -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-col flex-1 lg:min-h-0">
+          <div class="flex items-center justify-between gap-2 mb-2.5 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">1</span>
+              <h2 class="text-sm font-semibold text-slate-900">Documentos base (.PDF)</h2>
+            </div>
+            <button type="button" id="add-more-files-btn" class="hidden px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+              + Agregar PDFs
+            </button>
+          </div>
+
+          <!-- Recuadro de subida directa (clic o arrastrar) -->
+          <div
+            id="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Seleccionar archivos PDF"
+            class="border-2 border-dashed border-slate-300 hover:border-blue-600 focus:border-blue-600 focus:outline-none bg-slate-50/80 hover:bg-blue-50/40 transition-colors rounded-xl p-4 text-center cursor-pointer shrink-0 select-none"
+          >
+            <div class="flex flex-col items-center gap-1.5 pointer-events-none">
+              <div class="p-2 bg-white rounded-full shadow-xs border border-slate-200 text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              <p class="text-xs sm:text-sm font-semibold text-slate-800">Hacé clic acá para elegir uno o varios PDF</p>
+              <p class="text-[11px] text-slate-500">O arrastrá tus archivos dentro de este recuadro</p>
+            </div>
+          </div>
+
+          <!-- Mensaje de error de validación de archivo -->
+          <div id="file-error-box" class="hidden mt-2.5 p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="file-error-text"></span>
+          </div>
+
+          <!-- Lista interna con scroll de PDFs cargados -->
+          <div id="files-list-wrapper" class="hidden mt-2.5 flex-1 flex flex-col lg:min-h-0">
+            <div class="flex items-center justify-between gap-2 mb-1.5 shrink-0">
+              <span id="loaded-files-summary" class="text-[11px] font-semibold text-blue-800 bg-blue-50 px-2.5 py-0.5 rounded-full">
+                0 documentos
+              </span>
+              <button type="button" id="clear-all-files-btn" class="text-[11px] font-medium text-red-600 hover:underline">
+                Quitar todos
+              </button>
+            </div>
+            <div id="loaded-files-list" class="flex-1 overflow-y-auto custom-scroll flex flex-col gap-1.5 pr-1 max-h-44 lg:max-h-none"></div>
+          </div>
+        </section>
+
+        <!-- Tarjeta 2: Ajustes de la marca de agua -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 shrink-0">
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">3</span>
+              <h2 class="text-sm font-semibold text-slate-900">Formato de marca (45°)</h2>
+            </div>
+            <button type="button" id="reset-settings-btn" class="text-[11px] text-blue-700 hover:underline font-medium">
+              Valores sugeridos
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- Tamaño de letra (16 a 18 pt) -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="flex justify-between items-center mb-1">
+                <label for="font-size-input" class="text-[11px] font-semibold text-slate-700">Letra (16–18)</label>
+                <span id="font-size-val" class="text-[11px] font-bold text-blue-700">17 pt</span>
+              </div>
+              <input type="range" id="font-size-input" min="16" max="18" step="0.5" value="17" class="w-full accent-blue-700 cursor-pointer h-1.5" />
+            </div>
+
+            <!-- Opacidad / Transparencia -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="flex justify-between items-center mb-1">
+                <label for="opacity-input" class="text-[11px] font-semibold text-slate-700">Opacidad</label>
+                <span id="opacity-val" class="text-[11px] font-bold text-blue-700">18%</span>
+              </div>
+              <input type="range" id="opacity-input" min="5" max="45" step="1" value="18" class="w-full accent-blue-700 cursor-pointer h-1.5" />
+            </div>
+
+            <!-- Interlineado -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="flex justify-between items-center mb-1">
+                <label for="line-spacing-input" class="text-[11px] font-semibold text-slate-700">Renglón</label>
+                <span id="line-spacing-val" class="text-[11px] font-bold text-blue-700">1,5</span>
+              </div>
+              <input type="range" id="line-spacing-input" min="1.2" max="2.2" step="0.1" value="1.5" class="w-full accent-blue-700 cursor-pointer h-1.5" />
+            </div>
+
+            <!-- Color de tinta -->
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <label for="color-select" class="block text-[11px] font-semibold text-slate-700 mb-1">Color de marca</label>
+              <select id="color-select" class="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="slate" selected>Gris pizarra</option>
+                <option value="black">Negro neutro</option>
+                <option value="red">Rojo confidencial</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- COLUMNA 2 (4/12): Códigos y Destinatarios -->
+      <section class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-col lg:h-full lg:min-h-0">
+        <div class="flex items-center justify-between gap-2 mb-2 shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">2</span>
+            <h2 class="text-sm font-semibold text-slate-900">Códigos y Destinatarios</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="export-json-btn" title="Exportar lista de códigos" class="px-2 py-1 text-[11px] font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+              Exportar
+            </button>
+            <button type="button" id="import-json-btn" title="Importar lista de códigos" class="px-2 py-1 text-[11px] font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+              Importar
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulario compacto para agregar o editar código -->
+        <form id="recipient-form" class="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-2.5 shrink-0">
+          <div class="flex items-center justify-between mb-1.5">
+            <span id="form-title" class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Nuevo código / destinatario</span>
+            <button type="button" id="cancel-edit-btn" class="hidden text-[11px] font-medium text-slate-500 hover:text-slate-800 underline">
+              Cancelar
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+            <div class="sm:col-span-5">
+              <input
+                type="text"
+                id="code-input"
+                placeholder="Código (ej: CS-DGCOJO)"
+                maxlength="40"
+                aria-label="Código de marca"
+                class="w-full px-2.5 py-1.5 text-xs font-mono uppercase bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+            </div>
+            <div class="sm:col-span-7">
+              <input
+                type="text"
+                id="ref-input"
+                placeholder="Persona / Área de referencia"
+                maxlength="100"
+                aria-label="Persona o área de referencia"
+                class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+            </div>
+          </div>
+
+          <div id="form-error" class="hidden mt-1.5 text-[11px] text-red-600 font-medium"></div>
+
+          <button
+            type="submit"
+            id="save-recipient-btn"
+            class="mt-2 w-full py-1.5 px-3 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span id="save-btn-text">Agregar a la lista</span>
+          </button>
+        </form>
+
+        <!-- Buscador y controles de selección -->
+        <div class="flex flex-col gap-2 pb-2 mb-2 border-b border-slate-200 shrink-0">
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              id="search-recipient-input"
+              placeholder="Buscar código o persona..."
+              class="w-full pl-8 pr-2.5 py-1 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white"
+            />
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
+              <button type="button" id="select-all-btn" class="px-2 py-1 text-[11px] font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors">
+                Todos
+              </button>
+              <button type="button" id="deselect-all-btn" class="px-2 py-1 text-[11px] font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors">
+                Ninguno
+              </button>
+            </div>
+            <span id="selected-counter" class="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full">
+              0 seleccionados
+            </span>
+          </div>
+        </div>
+
+        <!-- Lista con scroll interno de destinatarios -->
+        <div id="recipients-list" class="flex-1 overflow-y-auto custom-scroll flex flex-col gap-2 pr-1 max-h-72 lg:max-h-none"></div>
+      </section>
+
+      <!-- COLUMNA 3 (4/12): Vista Previa en Tiempo Real + Descargas -->
+      <section class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-col lg:h-full lg:min-h-0">
+        <!-- Cabecera y selectores de vista previa -->
+        <div class="shrink-0 mb-2">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <h2 class="text-sm font-semibold text-slate-900">Vista previa en hoja</h2>
+            <span id="preview-subtitle" class="text-[11px] text-slate-500 truncate max-w-[180px]">Hoja A4 de muestra</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div id="preview-doc-selector-wrap" class="hidden">
+              <select id="preview-doc-select" aria-label="Documento a previsualizar" class="w-full px-2 py-1 text-[11px] font-medium bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 truncate"></select>
+            </div>
+            <div id="preview-code-selector-wrap" class="col-span-2">
+              <select id="preview-code-select" aria-label="Código a previsualizar" class="w-full px-2 py-1 text-[11px] font-mono font-semibold bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenedor flexible del Canvas que se adapta exactamente al espacio disponible sin desbordar -->
+        <div id="preview-wrapper" class="flex-1 min-h-[220px] lg:min-h-0 bg-slate-200/80 rounded-xl p-2.5 flex items-center justify-center border border-slate-200 overflow-hidden">
+          <canvas id="preview-canvas" class="bg-white shadow-md rounded-xs block"></canvas>
+        </div>
+
+        <!-- Zona inferior fija con resumen y botones de descarga -->
+        <div class="shrink-0 pt-3 mt-2.5 border-t border-slate-200">
+          <div id="generation-summary-pill" class="mb-2.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 text-center">
+            Subí al menos 1 PDF y marcá al menos 1 destinatario.
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2">
+            <!-- Botón Principal: ZIP -->
+            <button
+              type="button"
+              id="generate-zip-btn"
+              disabled
+              class="py-2.5 px-3 bg-blue-700 hover:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              <span id="generate-zip-label" class="truncate">Descargar todo en ZIP</span>
+            </button>
+
+            <!-- Botón Secundario: Sueltos -->
+            <button
+              type="button"
+              id="generate-individual-btn"
+              disabled
+              class="py-2.5 px-3 bg-white hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed text-slate-700 border border-slate-300 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span id="generate-individual-label" class="truncate">Descargar PDFs sueltos</span>
+            </button>
+          </div>
+
+          <!-- Barra de progreso -->
+          <div id="progress-container" class="hidden mt-2.5">
+            <div class="flex justify-between text-[11px] font-medium text-slate-600 mb-1">
+              <span id="progress-text" class="truncate">Procesando...</span>
+              <span id="progress-percent">0%</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div id="progress-bar" class="bg-blue-700 h-1.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Acceso rápido a archivos generados -->
+          <div id="results-banner" class="hidden mt-2.5 p-2 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+            <span id="results-banner-text" class="text-[11px] font-medium text-emerald-800 truncate">Archivos listos</span>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" id="open-results-modal-btn" class="text-[11px] font-semibold text-blue-700 hover:underline">
+                Ver lista
+              </button>
+              <button type="button" id="redownload-zip-btn" class="hidden text-[11px] font-semibold text-emerald-700 hover:underline">
+                Bajar ZIP
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Modal de confirmación para eliminar destinatario -->
+  <div id="delete-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-200">
+      <h3 class="text-base font-bold text-slate-900 mb-1.5">¿Eliminar este código?</h3>
+      <p id="delete-modal-text" class="text-xs sm:text-sm text-slate-600 mb-4">
+        Esta acción quitará el código de tu lista guardada.
+      </p>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="cancel-delete-btn" class="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+          Cancelar
+        </button>
+        <button type="button" id="confirm-delete-btn" class="px-3.5 py-2 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">
+          Sí, eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal con la lista completa de PDFs generados para descarga individual de respaldo -->
+  <div id="results-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-xl border border-slate-200 flex flex-col max-h-[80vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 shrink-0">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Archivos PDF generados</h3>
+          <p class="text-xs text-slate-500">Podés descargar individualmente cualquiera de los archivos generados</p>
+        </div>
+        <button type="button" id="close-results-modal-btn" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="generated-files-list" class="flex-1 overflow-y-auto custom-scroll flex flex-col gap-2 my-3 pr-1"></div>
+      <div class="flex justify-end pt-2 border-t border-slate-200 shrink-0">
+        <button type="button" id="done-results-modal-btn" class="px-4 py-2 text-xs font-semibold text-white bg-blue-700 hover:bg-blue-800 rounded-xl">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configurar worker de pdf.js
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    const STORAGE_KEY = 'wm_generador_destinatarios_v1';
+    const INIT_FLAG_KEY = 'wm_generador_initialized_v1';
+    const SETTINGS_KEY = 'wm_generador_config_v1';
+
+    let state = {
+      pdfFiles: [],
+      previewDocId: null,
+      recipients: [],
+      searchQuery: '',
+      editingId: null,
+      deleteTargetId: null,
+      previewRecipientId: null,
+      generatedBlobs: [],
+      lastZipUrl: null,
+      lastZipName: '',
+      isProcessing: false,
+      settings: {
+        fontSize: 17,
+        opacity: 18,
+        lineSpacing: 1.5,
+        angle: 45,
+        color: 'slate'
+      }
+    };
+
+    const el = {
+      pdfInput: document.getElementById('pdf-input'),
+      importJsonInput: document.getElementById('import-json-input'),
+      dropZone: document.getElementById('drop-zone'),
+      fileErrorBox: document.getElementById('file-error-box'),
+      fileErrorText: document.getElementById('file-error-text'),
+      filesListWrapper: document.getElementById('files-list-wrapper'),
+      loadedFilesSummary: document.getElementById('loaded-files-summary'),
+      loadedFilesList: document.getElementById('loaded-files-list'),
+      addMoreFilesBtn: document.getElementById('add-more-files-btn'),
+      clearAllFilesBtn: document.getElementById('clear-all-files-btn'),
+
+      recipientForm: document.getElementById('recipient-form'),
+      formTitle: document.getElementById('form-title'),
+      cancelEditBtn: document.getElementById('cancel-edit-btn'),
+      codeInput: document.getElementById('code-input'),
+      refInput: document.getElementById('ref-input'),
+      formError: document.getElementById('form-error'),
+      saveRecipientBtn: document.getElementById('save-recipient-btn'),
+      saveBtnText: document.getElementById('save-btn-text'),
+
+      searchRecipientInput: document.getElementById('search-recipient-input'),
+      selectAllBtn: document.getElementById('select-all-btn'),
+      deselectAllBtn: document.getElementById('deselect-all-btn'),
+      selectedCounter: document.getElementById('selected-counter'),
+      recipientsList: document.getElementById('recipients-list'),
+
+      exportJsonBtn: document.getElementById('export-json-btn'),
+      importJsonBtn: document.getElementById('import-json-btn'),
+
+      fontSizeInput: document.getElementById('font-size-input'),
+      fontSizeVal: document.getElementById('font-size-val'),
+      opacityInput: document.getElementById('opacity-input'),
+      opacityVal: document.getElementById('opacity-val'),
+      lineSpacingInput: document.getElementById('line-spacing-input'),
+      lineSpacingVal: document.getElementById('line-spacing-val'),
+      colorSelect: document.getElementById('color-select'),
+      resetSettingsBtn: document.getElementById('reset-settings-btn'),
+
+      previewSubtitle: document.getElementById('preview-subtitle'),
+      previewDocSelectorWrap: document.getElementById('preview-doc-selector-wrap'),
+      previewDocSelect: document.getElementById('preview-doc-select'),
+      previewCodeSelectorWrap: document.getElementById('preview-code-selector-wrap'),
+      previewCodeSelect: document.getElementById('preview-code-select'),
+      previewWrapper: document.getElementById('preview-wrapper'),
+      previewCanvas: document.getElementById('preview-canvas'),
+
+      generationSummaryPill: document.getElementById('generation-summary-pill'),
+      generateZipBtn: document.getElementById('generate-zip-btn'),
+      generateZipLabel: document.getElementById('generate-zip-label'),
+      generateIndividualBtn: document.getElementById('generate-individual-btn'),
+      generateIndividualLabel: document.getElementById('generate-individual-label'),
+      progressContainer: document.getElementById('progress-container'),
+      progressText: document.getElementById('progress-text'),
+      progressPercent: document.getElementById('progress-percent'),
+      progressBar: document.getElementById('progress-bar'),
+      resultsBanner: document.getElementById('results-banner'),
+      resultsBannerText: document.getElementById('results-banner-text'),
+      openResultsModalBtn: document.getElementById('open-results-modal-btn'),
+      redownloadZipBtn: document.getElementById('redownload-zip-btn'),
+
+      deleteModal: document.getElementById('delete-modal'),
+      deleteModalText: document.getElementById('delete-modal-text'),
+      cancelDeleteBtn: document.getElementById('cancel-delete-btn'),
+      confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
+
+      resultsModal: document.getElementById('results-modal'),
+      closeResultsModalBtn: document.getElementById('close-results-modal-btn'),
+      doneResultsModalBtn: document.getElementById('done-results-modal-btn'),
+      generatedFilesList: document.getElementById('generated-files-list'),
+      toastContainer: document.getElementById('toast-container')
+    };
+
+    // --- UTILIDADES ---
+
+    function generateId() {
+      return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function sanitizeFileName(name) {
+      return name
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '');
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-900 text-white border-emerald-700',
+        error: 'bg-red-900 text-white border-red-700',
+        info: 'bg-slate-900 text-white border-slate-700'
+      };
+      toast.className = `${colors[type] || colors.info} border px-3.5 py-2.5 rounded-xl shadow-lg text-xs font-medium pointer-events-auto transition-opacity duration-300`;
+      toast.textContent = message;
+      el.toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    // --- PERSISTENCIA EN LOCALSTORAGE ---
+
+    function loadSavedData() {
+      try {
+        const wasInitialized = localStorage.getItem(INIT_FLAG_KEY);
+        const savedRecipients = localStorage.getItem(STORAGE_KEY);
+
+        if (savedRecipients) {
+          const parsed = JSON.parse(savedRecipients);
+          if (Array.isArray(parsed)) {
+            state.recipients = parsed;
+          }
+        } else if (!wasInitialized) {
+          // Precargar ejemplos iniciales solo la primera vez que se abre la app
+          state.recipients = [
+            {
+              id: generateId(),
+              code: 'CS-DGCOJO',
+              reference: 'Carlos Sánchez - Dirección General Central OJO',
+              selected: true
+            },
+            {
+              id: generateId(),
+              code: 'ML-DIRLEG',
+              reference: 'María López - Dirección de Asuntos Legales',
+              selected: true
+            },
+            {
+              id: generateId(),
+              code: 'JP-AUDINT',
+              reference: 'Juan Pérez - Auditoría Interna',
+              selected: false
+            }
+          ];
+          localStorage.setItem(INIT_FLAG_KEY, '1');
+          saveRecipients();
+        }
+
+        const savedSettings = localStorage.getItem(SETTINGS_KEY);
+        if (savedSettings) {
+          const parsedSettings = JSON.parse(savedSettings);
+          state.settings = { ...state.settings, ...parsedSettings };
+        }
+      } catch (e) {
+        console.warn('No se pudo leer localStorage:', e);
+      }
+    }
+
+    function saveRecipients() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.recipients));
+        localStorage.setItem(INIT_FLAG_KEY, '1');
+      } catch (e) {
+        console.warn('No se pudo guardar destinatarios en localStorage:', e);
+      }
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+      } catch (e) {
+        console.warn('No se pudo guardar configuración en localStorage:', e);
+      }
+    }
+
+    // --- APERTURA FIABLE DEL SELECTOR DE ARCHIVOS ---
+
+    function openPdfFileDialog() {
+      // Limpiar value antes de abrir permite volver a elegir el mismo archivo si se quitó
+      el.pdfInput.value = '';
+      el.pdfInput.click();
+    }
+
+    // --- GESTIÓN DE MÚLTIPLES ARCHIVOS PDF ---
+
+    function showFileError(msg) {
+      el.fileErrorText.textContent = msg;
+      el.fileErrorBox.classList.remove('hidden');
+    }
+
+    function clearFileError() {
+      el.fileErrorBox.classList.add('hidden');
+      el.fileErrorText.textContent = '';
+    }
+
+    async function handlePdfFiles(fileList) {
+      clearFileError();
+      if (!fileList || fileList.length === 0) return;
+
+      const filesArray = Array.from(fileList);
+      let loadedCount = 0;
+      const errors = [];
+
+      for (const file of filesArray) {
+        const isPdfExtension = file.name.toLowerCase().endsWith('.pdf');
+        const isPdfMime = file.type === 'application/pdf' || file.type === '';
+
+        if (!isPdfExtension || (!isPdfMime && file.type !== 'application/x-pdf')) {
+          errors.push(`"${file.name}" no es un PDF válido.`);
+          continue;
+        }
+
+        const alreadyExists = state.pdfFiles.some(
+          existing => existing.name === file.name && existing.size === file.size
+        );
+        if (alreadyExists) {
+          errors.push(`"${file.name}" ya estaba en la lista.`);
+          continue;
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+
+          // Verificar firma %PDF-
+          const headerBytes = new Uint8Array(arrayBuffer.slice(0, 5));
+          const headerStr = String.fromCharCode(...headerBytes);
+          if (headerStr !== '%PDF-') {
+            errors.push(`"${file.name}" no tiene estructura PDF válida.`);
+            continue;
+          }
+
+          const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { ignoreEncryption: false });
+          const pageCount = pdfDoc.getPageCount();
+          const firstPageImage = await renderPdfFirstPage(arrayBuffer.slice(0));
+
+          const docObj = {
+            id: generateId(),
+            name: file.name,
+            baseName: file.name.replace(/\.pdf$/i, ''),
+            size: file.size,
+            pageCount: pageCount,
+            bytes: arrayBuffer,
+            firstPageImage: firstPageImage
+          };
+
+          state.pdfFiles.push(docObj);
+          if (!state.previewDocId) {
+            state.previewDocId = docObj.id;
+          }
+          loadedCount++;
+        } catch (err) {
+          console.error(err);
+          if (err && err.message && err.message.toLowerCase().includes('encrypt')) {
+            errors.push(`"${file.name}" está protegido con contraseña.`);
+          } else {
+            errors.push(`No se pudo procesar "${file.name}".`);
+          }
+        }
+      }
+
+      if (errors.length > 0) {
+        showFileError(errors.join(' '));
+      }
+
+      if (loadedCount > 0) {
+        el.resultsBanner.classList.add('hidden');
+        renderLoadedFilesList();
+        updatePreview();
+        updateGenerateButtonState();
+        showToast(
+          loadedCount === 1
+            ? '1 PDF cargado correctamente.'
+            : `${loadedCount} PDFs cargados correctamente.`,
+          'success'
+        );
+      }
+    }
+
+    async function renderPdfFirstPage(bufferCopy) {
+      if (!window.pdfjsLib) return null;
+      try {
+        const loadingTask = pdfjsLib.getDocument({ data: bufferCopy });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
+
+        const viewport = page.getViewport({ scale: 1.5 });
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = viewport.width;
+        offscreenCanvas.height = viewport.height;
+        const ctx = offscreenCanvas.getContext('2d');
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        return {
+          canvas: offscreenCanvas,
+          ptWidth: page.getViewport({ scale: 1 }).width,
+          ptHeight: page.getViewport({ scale: 1 }).height
+        };
+      } catch (err) {
+        console.warn('No se pudo renderizar vista previa del PDF:', err);
+        return null;
+      }
+    }
+
+    function renderLoadedFilesList() {
+      if (state.pdfFiles.length === 0) {
+        el.filesListWrapper.classList.add('hidden');
+        el.addMoreFilesBtn.classList.add('hidden');
+        el.dropZone.classList.remove('hidden');
+        el.previewDocSelectorWrap.classList.add('hidden');
+        el.previewCodeSelectorWrap.classList.add('col-span-2');
+        el.previewSubtitle.textContent = 'Hoja A4 de muestra';
+        return;
+      }
+
+      el.dropZone.classList.add('hidden');
+      el.filesListWrapper.classList.remove('hidden');
+      el.addMoreFilesBtn.classList.remove('hidden');
+
+      const totalPages = state.pdfFiles.reduce((acc, f) => acc + f.pageCount, 0);
+      el.loadedFilesSummary.textContent = `${state.pdfFiles.length} ${
+        state.pdfFiles.length === 1 ? 'PDF cargado' : 'PDFs cargados'
+      } (${totalPages} ${totalPages === 1 ? 'pág.' : 'págs.'})`;
+
+      el.loadedFilesList.innerHTML = '';
+      state.pdfFiles.forEach(doc => {
+        const isPreviewing = doc.id === state.previewDocId;
+        const row = document.createElement('div');
+        row.className = `px-2.5 py-2 rounded-xl border transition-colors flex items-center justify-between gap-2 ${
+          isPreviewing ? 'bg-blue-50/70 border-blue-200' : 'bg-slate-50 border-slate-200'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <div class="p-1.5 bg-blue-700 text-white rounded-lg shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-semibold text-slate-900 truncate" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</p>
+              <p class="text-[10px] text-slate-500">${doc.pageCount} ${doc.pageCount === 1 ? 'página' : 'páginas'} • ${formatBytes(doc.size)}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-0.5 shrink-0">
+            <button
+              type="button"
+              data-file-action="preview"
+              data-id="${doc.id}"
+              title="Ver en vista previa"
+              class="p-1.5 text-slate-500 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              data-file-action="remove"
+              data-id="${doc.id}"
+              title="Quitar archivo"
+              class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        `;
+        el.loadedFilesList.appendChild(row);
+      });
+
+      el.previewDocSelectorWrap.classList.remove('hidden');
+      el.previewCodeSelectorWrap.classList.remove('col-span-2');
+      el.previewDocSelect.innerHTML = '';
+      state.pdfFiles.forEach(doc => {
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = doc.name;
+        if (doc.id === state.previewDocId) opt.selected = true;
+        el.previewDocSelect.appendChild(opt);
+      });
+    }
+
+    function removeSinglePdf(id) {
+      state.pdfFiles = state.pdfFiles.filter(f => f.id !== id);
+      if (state.previewDocId === id) {
+        state.previewDocId = state.pdfFiles.length > 0 ? state.pdfFiles[0].id : null;
+      }
+      el.resultsBanner.classList.add('hidden');
+      renderLoadedFilesList();
+      updatePreview();
+      updateGenerateButtonState();
+    }
+
+    function clearAllLoadedPdfs() {
+      state.pdfFiles = [];
+      state.previewDocId = null;
+      el.pdfInput.value = '';
+      el.resultsBanner.classList.add('hidden');
+      clearFileError();
+      renderLoadedFilesList();
+      updatePreview();
+      updateGenerateButtonState();
+    }
+
+    // --- GESTIÓN DE DESTINATARIOS ---
+
+    function renderRecipientsList() {
+      el.recipientsList.innerHTML = '';
+
+      const query = state.searchQuery.trim().toLowerCase();
+      const filtered = query
+        ? state.recipients.filter(
+            r =>
+              r.code.toLowerCase().includes(query) ||
+              r.reference.toLowerCase().includes(query)
+          )
+        : state.recipients;
+
+      if (state.recipients.length === 0) {
+        el.recipientsList.innerHTML = `
+          <div class="text-center py-6 px-3 border border-dashed border-slate-200 rounded-xl bg-slate-50/60">
+            <p class="text-xs font-medium text-slate-600">No hay códigos guardados</p>
+            <p class="text-[11px] text-slate-400 mt-1">Agregá un código y su referencia arriba.</p>
+          </div>
+        `;
+      } else if (filtered.length === 0) {
+        el.recipientsList.innerHTML = `
+          <div class="text-center py-5 px-3 border border-dashed border-slate-200 rounded-xl bg-slate-50/60">
+            <p class="text-xs text-slate-500">Sin resultados para "${escapeHtml(state.searchQuery)}"</p>
+          </div>
+        `;
+      } else {
+        filtered.forEach(item => {
+          const isEditing = state.editingId === item.id;
+          const isPreviewing = state.previewRecipientId === item.id;
+
+          const card = document.createElement('div');
+          card.className = `px-2.5 py-2 rounded-xl border transition-all flex items-center justify-between gap-2 ${
+            item.selected
+              ? 'bg-blue-50/50 border-blue-200'
+              : 'bg-white border-slate-200 hover:border-slate-300'
+          } ${isEditing ? 'ring-2 ring-amber-400' : ''}`;
+
+          card.innerHTML = `
+            <label class="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                data-action="toggle"
+                data-id="${item.id}"
+                ${item.selected ? 'checked' : ''}
+                class="h-4 w-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600 cursor-pointer shrink-0"
+              />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white tracking-wide">
+                    ${escapeHtml(item.code)}
+                  </span>
+                  ${isPreviewing ? '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">Vista previa</span>' : ''}
+                </div>
+                <p class="text-xs text-slate-700 mt-0.5 truncate" title="${escapeHtml(item.reference)}">
+                  ${escapeHtml(item.reference)}
+                </p>
+              </div>
+            </label>
+
+            <div class="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                data-action="preview"
+                data-id="${item.id}"
+                title="Ver en vista previa"
+                class="p-1.5 text-slate-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                data-action="edit"
+                data-id="${item.id}"
+                title="Modificar código o referencia"
+                class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                data-action="delete"
+                data-id="${item.id}"
+                title="Eliminar"
+                class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          `;
+
+          el.recipientsList.appendChild(card);
+        });
+      }
+
+      updateSelectionCounter();
+      syncPreviewSelector();
+      updateGenerateButtonState();
+    }
+
+    function updateSelectionCounter() {
+      const selectedCount = state.recipients.filter(r => r.selected).length;
+      const total = state.recipients.length;
+      el.selectedCounter.textContent = `${selectedCount} de ${total} ${selectedCount === 1 ? 'seleccionado' : 'seleccionados'}`;
+    }
+
+    function syncPreviewSelector() {
+      el.previewCodeSelect.innerHTML = '';
+      if (state.recipients.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'CS-DGCOJO (Ejemplo)';
+        el.previewCodeSelect.appendChild(opt);
+        state.previewRecipientId = null;
+        return;
+      }
+
+      const exists = state.recipients.some(r => r.id === state.previewRecipientId);
+      if (!exists) {
+        const firstSelected = state.recipients.find(r => r.selected) || state.recipients[0];
+        state.previewRecipientId = firstSelected.id;
+      }
+
+      state.recipients.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.id;
+        opt.textContent = `${r.code} — ${r.reference}`;
+        if (r.id === state.previewRecipientId) opt.selected = true;
+        el.previewCodeSelect.appendChild(opt);
+      });
+    }
+
+    function startEditRecipient(id) {
+      const target = state.recipients.find(r => r.id === id);
+      if (!target) return;
+
+      state.editingId = id;
+      el.codeInput.value = target.code;
+      el.refInput.value = target.reference;
+      el.formTitle.textContent = `Editando: ${target.code}`;
+      el.saveBtnText.textContent = 'Guardar cambios';
+      el.saveRecipientBtn.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+      el.saveRecipientBtn.classList.add('bg-amber-600', 'hover:bg-amber-700');
+      el.cancelEditBtn.classList.remove('hidden');
+      el.formError.classList.add('hidden');
+      el.codeInput.focus();
+      renderRecipientsList();
+    }
+
+    function cancelEditRecipient() {
+      state.editingId = null;
+      el.codeInput.value = '';
+      el.refInput.value = '';
+      el.formTitle.textContent = 'Nuevo código / destinatario';
+      el.saveBtnText.textContent = 'Agregar a la lista';
+      el.saveRecipientBtn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+      el.saveRecipientBtn.classList.add('bg-blue-700', 'hover:bg-blue-800');
+      el.cancelEditBtn.classList.add('hidden');
+      el.formError.classList.add('hidden');
+      renderRecipientsList();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      el.formError.classList.add('hidden');
+
+      const rawCode = el.codeInput.value.trim().toUpperCase();
+      const rawRef = el.refInput.value.trim();
+
+      if (!rawCode) {
+        el.formError.textContent = 'Ingresá el código de la marca (ej: CS-DGCOJO).';
+        el.formError.classList.remove('hidden');
+        el.codeInput.focus();
+        return;
+      }
+
+      if (!rawRef) {
+        el.formError.textContent = 'Ingresá la persona o área de referencia.';
+        el.formError.classList.remove('hidden');
+        el.refInput.focus();
+        return;
+      }
+
+      const duplicate = state.recipients.some(
+        r => r.code.toUpperCase() === rawCode && r.id !== state.editingId
+      );
+      if (duplicate) {
+        el.formError.textContent = `El código "${rawCode}" ya existe en tu lista.`;
+        el.formError.classList.remove('hidden');
+        el.codeInput.focus();
+        return;
+      }
+
+      if (state.editingId) {
+        const idx = state.recipients.findIndex(r => r.id === state.editingId);
+        if (idx !== -1) {
+          state.recipients[idx].code = rawCode;
+          state.recipients[idx].reference = rawRef;
+          state.previewRecipientId = state.recipients[idx].id;
+        }
+        saveRecipients();
+        cancelEditRecipient();
+        updatePreview();
+        showToast(`Código ${rawCode} actualizado.`, 'success');
+      } else {
+        const newItem = {
+          id: generateId(),
+          code: rawCode,
+          reference: rawRef,
+          selected: true
+        };
+        state.recipients.unshift(newItem);
+        state.previewRecipientId = newItem.id;
+        el.codeInput.value = '';
+        el.refInput.value = '';
+        saveRecipients();
+        renderRecipientsList();
+        updatePreview();
+        showToast(`Código ${rawCode} agregado.`, 'success');
+      }
+    }
+
+    // --- MOTOR MATEMÁTICO DE MARCA DE AGUA DIAGONAL A 45° ---
+
+    function computeWatermarkPositions(pageWidth, pageHeight, textWidth, fontSize, lineSpacing) {
+      const positions = [];
+      const rowStep = fontSize * lineSpacing * 2.4;
+      const colStep = textWidth + fontSize * 3.2;
+
+      const diag = Math.hypot(pageWidth, pageHeight);
+      const centerX = pageWidth / 2;
+      const centerY = pageHeight / 2;
+      const rad = (45 * Math.PI) / 180;
+      const cosA = Math.cos(rad);
+      const sinA = Math.sin(rad);
+
+      const halfSpan = diag * 0.75;
+      let rowIndex = 0;
+
+      for (let v = -halfSpan; v <= halfSpan; v += rowStep) {
+        const stagger = (rowIndex % 2) * (colStep * 0.5);
+        for (let u = -halfSpan - stagger; u <= halfSpan; u += colStep) {
+          const x = centerX + u * cosA - v * sinA;
+          const y = centerY + u * sinA + v * cosA;
+
+          const margin = textWidth + 60;
+          if (x >= -margin && x <= pageWidth + margin && y >= -margin && y <= pageHeight + margin) {
+            positions.push({ x, y });
+          }
+        }
+        rowIndex++;
+      }
+
+      return positions;
+    }
+
+    function getInkRgb() {
+      switch (state.settings.color) {
+        case 'black':
+          return { r: 0.08, g: 0.08, b: 0.08, css: '15, 23, 42' };
+        case 'red':
+          return { r: 0.72, g: 0.11, b: 0.11, css: '185, 28, 28' };
+        case 'slate':
+        default:
+          return { r: 0.25, g: 0.30, b: 0.38, css: '64, 77, 97' };
+      }
+    }
+
+    // --- VISTA PREVIA EN CANVAS ADAPTADA AL ALTO DEL PANEL ---
+
+    function updatePreview() {
+      const canvas = el.previewCanvas;
+      const ctx = canvas.getContext('2d');
+
+      const activeRecipient = state.recipients.find(r => r.id === state.previewRecipientId);
+      const codeToDraw = activeRecipient ? activeRecipient.code : 'CS-DGCOJO';
+
+      const activeDoc = state.pdfFiles.find(d => d.id === state.previewDocId) || state.pdfFiles[0] || null;
+      const pageImg = activeDoc ? activeDoc.firstPageImage : null;
+
+      if (activeDoc) {
+        el.previewSubtitle.textContent = `Pág. 1: ${activeDoc.name}`;
+      } else {
+        el.previewSubtitle.textContent = 'Hoja A4 de muestra';
+      }
+
+      const ptWidth = pageImg ? pageImg.ptWidth : 595;
+      const ptHeight = pageImg ? pageImg.ptHeight : 842;
+
+      // Ajustar escala tanto al ancho como al alto disponible del contenedor para evitar scroll
+      const availWidth = Math.max(180, el.previewWrapper.clientWidth - 20);
+      const availHeight = Math.max(200, el.previewWrapper.clientHeight - 20);
+      const scale = Math.min(availWidth / ptWidth, availHeight / ptHeight, 1.15);
+
+      canvas.width = Math.max(1, Math.round(ptWidth * scale));
+      canvas.height = Math.max(1, Math.round(ptHeight * scale));
+
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo: página 1 del PDF o documento simulado
+      if (pageImg && pageImg.canvas) {
+        ctx.drawImage(pageImg.canvas, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(45 * scale, 52 * scale, 190 * scale, 13 * scale);
+        ctx.fillStyle = '#e2e8f0';
+        for (let line = 0; line < 18; line++) {
+          const yPos = (92 + line * 36) * scale;
+          const w = (line % 4 === 3 ? 330 : 495) * scale;
+          ctx.fillRect(45 * scale, yPos, w, 8 * scale);
+        }
+      }
+
+      // Estampar patrón diagonal a 45° exactamente igual al PDF final
+      const fontSizePt = state.settings.fontSize;
+      const opacity = state.settings.opacity / 100;
+      const lineSpacing = state.settings.lineSpacing;
+      const ink = getInkRgb();
+
+      ctx.font = `700 ${fontSizePt * scale}px Helvetica, Arial, sans-serif`;
+      const textWidthPt = ctx.measureText(codeToDraw).width / scale;
+
+      const positions = computeWatermarkPositions(ptWidth, ptHeight, textWidthPt, fontSizePt, lineSpacing);
+      ctx.fillStyle = `rgba(${ink.css}, ${opacity})`;
+      ctx.textBaseline = 'alphabetic';
+
+      for (const pos of positions) {
+        const cx = pos.x * scale;
+        const cy = (ptHeight - pos.y) * scale;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate((-45 * Math.PI) / 180);
+        ctx.fillText(codeToDraw, 0, 0);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // --- GENERACIÓN DE PDFS (ZIP O SUELTOS) ---
+
+    function updateGenerateButtonState() {
+      const selectedCount = state.recipients.filter(r => r.selected).length;
+      const docsCount = state.pdfFiles.length;
+      const totalOutputs = docsCount * selectedCount;
+      const ready = docsCount > 0 && selectedCount > 0 && !state.isProcessing;
+
+      el.generateZipBtn.disabled = !ready;
+      el.generateIndividualBtn.disabled = !ready;
+
+      if (docsCount === 0 && selectedCount === 0) {
+        el.generationSummaryPill.innerHTML = 'Subí al menos <strong>1 PDF</strong> y marcá al menos <strong>1 destinatario</strong>.';
+        el.generateZipLabel.textContent = 'Descargar todo en ZIP';
+        el.generateIndividualLabel.textContent = 'Descargar PDFs sueltos';
+      } else if (docsCount === 0) {
+        el.generationSummaryPill.innerHTML = `<strong>${selectedCount}</strong> ${selectedCount === 1 ? 'destinatario marcado' : 'destinatarios marcados'}. Falta subir al menos 1 PDF.`;
+        el.generateZipLabel.textContent = 'Subí un PDF primero';
+        el.generateIndividualLabel.textContent = 'Descargar PDFs sueltos';
+      } else if (selectedCount === 0) {
+        el.generationSummaryPill.innerHTML = `<strong>${docsCount}</strong> ${docsCount === 1 ? 'PDF cargado' : 'PDFs cargados'}. Marcá al menos 1 destinatario.`;
+        el.generateZipLabel.textContent = 'Marcá 1 destinatario';
+        el.generateIndividualLabel.textContent = 'Descargar PDFs sueltos';
+      } else {
+        el.generationSummaryPill.innerHTML = `Se generarán <strong>${totalOutputs} ${totalOutputs === 1 ? 'PDF' : 'PDFs'}</strong> (${docsCount} doc. × ${selectedCount} dest.).`;
+        el.generateZipLabel.textContent = `Descargar ZIP (${totalOutputs})`;
+        el.generateIndividualLabel.textContent = `Sueltos (${totalOutputs})`;
+      }
+    }
+
+    function clearPreviousBlobs() {
+      state.generatedBlobs.forEach(url => URL.revokeObjectURL(url));
+      state.generatedBlobs = [];
+      if (state.lastZipUrl) {
+        URL.revokeObjectURL(state.lastZipUrl);
+        state.lastZipUrl = null;
+        state.lastZipName = '';
+      }
+      el.redownloadZipBtn.classList.add('hidden');
+    }
+
+    function triggerDownload(url, fileName) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function getTodayDateString() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    async function generateWatermarkedPdfs(mode = 'zip') {
+      const selectedRecipients = state.recipients.filter(r => r.selected);
+      const docsToProcess = state.pdfFiles;
+
+      if (docsToProcess.length === 0) {
+        showToast('Subí al menos un archivo PDF primero.', 'error');
+        return;
+      }
+      if (selectedRecipients.length === 0) {
+        showToast('Marcá la casilla de al menos un destinatario.', 'error');
+        return;
+      }
+      if (mode === 'zip' && typeof JSZip === 'undefined') {
+        showToast('El compresor ZIP no está disponible. Probá descargar los PDFs sueltos.', 'error');
+        return;
+      }
+
+      clearPreviousBlobs();
+      state.isProcessing = true;
+      updateGenerateButtonState();
+      el.progressContainer.classList.remove('hidden');
+      el.resultsBanner.classList.add('hidden');
+      el.generatedFilesList.innerHTML = '';
+
+      const fontSize = state.settings.fontSize;
+      const opacity = state.settings.opacity / 100;
+      const lineSpacing = state.settings.lineSpacing;
+      const ink = getInkRgb();
+      const pdfColor = PDFLib.rgb(ink.r, ink.g, ink.b);
+
+      const totalTasks = docsToProcess.length * selectedRecipients.length;
+      let completedTasks = 0;
+      const zip = mode === 'zip' ? new JSZip() : null;
+      const usedOutputNames = new Set();
+
+      try {
+        for (const docItem of docsToProcess) {
+          for (const recipient of selectedRecipients) {
+            const percent = Math.round((completedTasks / totalTasks) * 100);
+            el.progressText.textContent = `${docItem.baseName} → ${recipient.code} (${completedTasks + 1}/${totalTasks})`;
+            el.progressPercent.textContent = `${percent}%`;
+            el.progressBar.style.width = `${percent}%`;
+
+            const pdfDoc = await PDFLib.PDFDocument.load(docItem.bytes);
+            const helveticaBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+            const pages = pdfDoc.getPages();
+
+            const codeText = recipient.code;
+            const textWidth = helveticaBold.widthOfTextAtSize(codeText, fontSize);
+
+            for (const page of pages) {
+              const { width, height } = page.getSize();
+              const positions = computeWatermarkPositions(width, height, textWidth, fontSize, lineSpacing);
+
+              for (const pos of positions) {
+                page.drawText(codeText, {
+                  x: pos.x,
+                  y: pos.y,
+                  size: fontSize,
+                  font: helveticaBold,
+                  color: pdfColor,
+                  opacity: opacity,
+                  rotate: PDFLib.degrees(45)
+                });
+              }
+            }
+
+            const modifiedPdfBytes = await pdfDoc.save();
+
+            let candidateName = `${sanitizeFileName(docItem.baseName)}_${sanitizeFileName(recipient.code)}.pdf`;
+            let suffix = 2;
+            while (usedOutputNames.has(candidateName.toLowerCase())) {
+              candidateName = `${sanitizeFileName(docItem.baseName)}_${sanitizeFileName(recipient.code)}_(${suffix}).pdf`;
+              suffix++;
+            }
+            usedOutputNames.add(candidateName.toLowerCase());
+
+            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+            const blobUrl = URL.createObjectURL(blob);
+            state.generatedBlobs.push(blobUrl);
+
+            if (mode === 'zip') {
+              zip.file(candidateName, modifiedPdfBytes);
+            } else {
+              triggerDownload(blobUrl, candidateName);
+              if (completedTasks < totalTasks - 1) {
+                await sleep(320);
+              }
+            }
+
+            const resultRow = document.createElement('div');
+            resultRow.className = 'p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2';
+            resultRow.innerHTML = `
+              <div class="min-w-0">
+                <p class="text-xs font-semibold text-slate-800 truncate" title="${escapeHtml(candidateName)}">${escapeHtml(candidateName)}</p>
+                <p class="text-[11px] text-slate-500 truncate">${escapeHtml(recipient.reference)}</p>
+              </div>
+              <a
+                href="${blobUrl}"
+                download="${escapeHtml(candidateName)}"
+                class="px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors shrink-0"
+              >
+                Bajar
+              </a>
+            `;
+            el.generatedFilesList.appendChild(resultRow);
+
+            completedTasks++;
+          }
+        }
+
+        if (mode === 'zip') {
+          el.progressText.textContent = 'Empaquetando archivo ZIP...';
+          el.progressPercent.textContent = '98%';
+          el.progressBar.style.width = '98%';
+
+          const zipBlob = await zip.generateAsync({ type: 'blob' });
+          const zipUrl = URL.createObjectURL(zipBlob);
+          const zipFileName = `Documentos_Marcados_${getTodayDateString()}.zip`;
+
+          state.lastZipUrl = zipUrl;
+          state.lastZipName = zipFileName;
+          el.redownloadZipBtn.classList.remove('hidden');
+
+          triggerDownload(zipUrl, zipFileName);
+          showToast(`ZIP "${zipFileName}" descargado con ${totalTasks} PDF(s).`, 'success');
+        } else {
+          showToast(`Se descargaron ${totalTasks} PDF(s) individuales.`, 'success');
+        }
+
+        el.progressText.textContent = '¡Listo!';
+        el.progressPercent.textContent = '100%';
+        el.progressBar.style.width = '100%';
+        el.resultsBannerText.textContent = `${totalTasks} ${totalTasks === 1 ? 'PDF generado' : 'PDFs generados'}`;
+        el.resultsBanner.classList.remove('hidden');
+      } catch (err) {
+        console.error('Error generando PDFs:', err);
+        showToast('Ocurrió un error al generar los PDFs.', 'error');
+      } finally {
+        state.isProcessing = false;
+        updateGenerateButtonState();
+      }
+    }
+
+    // --- IMPORTAR / EXPORTAR LISTA DE CÓDIGOS ---
+
+    function exportRecipientsJson() {
+      if (state.recipients.length === 0) {
+        showToast('No hay códigos para exportar.', 'info');
+        return;
+      }
+      const dataStr = JSON.stringify(state.recipients, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url, 'lista_codigos_destinatarios.json');
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Lista exportada en JSON.', 'success');
+    }
+
+    async function importRecipientsJson(file) {
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!Array.isArray(parsed)) throw new Error('Formato inválido');
+
+        let addedCount = 0;
+        parsed.forEach(item => {
+          if (item && typeof item.code === 'string' && typeof item.reference === 'string') {
+            const cleanCode = item.code.trim().toUpperCase();
+            const cleanRef = item.reference.trim();
+            if (cleanCode && cleanRef && !state.recipients.some(r => r.code === cleanCode)) {
+              state.recipients.push({
+                id: generateId(),
+                code: cleanCode,
+                reference: cleanRef,
+                selected: Boolean(item.selected)
+              });
+              addedCount++;
+            }
+          }
+        });
+        saveRecipients();
+        renderRecipientsList();
+        updatePreview();
+        showToast(`Se importaron ${addedCount} código(s).`, 'success');
+      } catch (err) {
+        showToast('El archivo JSON no es válido.', 'error');
+      } finally {
+        el.importJsonInput.value = '';
+      }
+    }
+
+    // --- INICIALIZACIÓN Y EVENTOS ---
+
+    function syncSettingsControls() {
+      el.fontSizeInput.value = state.settings.fontSize;
+      el.fontSizeVal.textContent = `${state.settings.fontSize} pt`;
+
+      el.opacityInput.value = state.settings.opacity;
+      el.opacityVal.textContent = `${state.settings.opacity}%`;
+
+      el.lineSpacingInput.value = state.settings.lineSpacing;
+      el.lineSpacingVal.textContent = state.settings.lineSpacing.toString().replace('.', ',');
+
+      el.colorSelect.value = state.settings.color;
+    }
+
+    function bindEvents() {
+      // Apertura 100% fiable del selector nativo de archivos PDF al hacer clic o presionar Enter/Espacio
+      el.dropZone.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openPdfFileDialog();
+      });
+
+      el.dropZone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openPdfFileDialog();
+        }
+      });
+
+      el.addMoreFilesBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openPdfFileDialog();
+      });
+
+      el.pdfInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          handlePdfFiles(e.target.files);
+        }
+      });
+
+      // Soporte completo de Drag & Drop
+      el.dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        el.dropZone.classList.add('border-blue-600', 'bg-blue-50/70');
+      });
+
+      el.dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        el.dropZone.classList.remove('border-blue-600', 'bg-blue-50/70');
+      });
+
+      el.dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        el.dropZone.classList.remove('border-blue-600', 'bg-blue-50/70');
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handlePdfFiles(e.dataTransfer.files);
+        }
+      });
+
+      // Acciones sobre PDFs cargados
+      el.loadedFilesList.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-file-action]');
+        if (!btn) return;
+        const action = btn.dataset.fileAction;
+        const id = btn.dataset.id;
+
+        if (action === 'preview') {
+          state.previewDocId = id;
+          renderLoadedFilesList();
+          updatePreview();
+        } else if (action === 'remove') {
+          removeSinglePdf(id);
+        }
+      });
+
+      el.clearAllFilesBtn.addEventListener('click', clearAllLoadedPdfs);
+
+      // Formulario de destinatarios
+      el.recipientForm.addEventListener('submit', handleFormSubmit);
+      el.cancelEditBtn.addEventListener('click', cancelEditRecipient);
+
+      // Buscador rápido
+      el.searchRecipientInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        renderRecipientsList();
+      });
+
+      // Selección y acciones en la lista de destinatarios
+      el.recipientsList.addEventListener('change', (e) => {
+        const target = e.target;
+        if (target.dataset && target.dataset.action === 'toggle') {
+          const id = target.dataset.id;
+          const item = state.recipients.find(r => r.id === id);
+          if (item) {
+            item.selected = target.checked;
+            if (target.checked) {
+              state.previewRecipientId = id;
+            }
+            saveRecipients();
+            renderRecipientsList();
+            updatePreview();
+          }
+        }
+      });
+
+      el.recipientsList.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+
+        if (action === 'preview') {
+          state.previewRecipientId = id;
+          renderRecipientsList();
+          updatePreview();
+        } else if (action === 'edit') {
+          startEditRecipient(id);
+        } else if (action === 'delete') {
+          const item = state.recipients.find(r => r.id === id);
+          if (item) {
+            state.deleteTargetId = id;
+            el.deleteModalText.textContent = `¿Estás seguro de eliminar el código "${item.code}" (${item.reference})?`;
+            el.deleteModal.classList.remove('hidden');
+          }
+        }
+      });
+
+      // Modal eliminar
+      el.cancelDeleteBtn.addEventListener('click', () => {
+        state.deleteTargetId = null;
+        el.deleteModal.classList.add('hidden');
+      });
+
+      el.confirmDeleteBtn.addEventListener('click', () => {
+        if (state.deleteTargetId) {
+          if (state.editingId === state.deleteTargetId) {
+            cancelEditRecipient();
+          }
+          state.recipients = state.recipients.filter(r => r.id !== state.deleteTargetId);
+          saveRecipients();
+          renderRecipientsList();
+          updatePreview();
+          showToast('Código eliminado.', 'info');
+        }
+        state.deleteTargetId = null;
+        el.deleteModal.classList.add('hidden');
+      });
+
+      // Selección masiva
+      el.selectAllBtn.addEventListener('click', () => {
+        state.recipients.forEach(r => (r.selected = true));
+        saveRecipients();
+        renderRecipientsList();
+      });
+
+      el.deselectAllBtn.addEventListener('click', () => {
+        state.recipients.forEach(r => (r.selected = false));
+        saveRecipients();
+        renderRecipientsList();
+      });
+
+      // Exportar / Importar JSON
+      el.exportJsonBtn.addEventListener('click', exportRecipientsJson);
+      el.importJsonBtn.addEventListener('click', () => {
+        el.importJsonInput.value = '';
+        el.importJsonInput.click();
+      });
+      el.importJsonInput.addEventListener('change', (e) => importRecipientsJson(e.target.files[0]));
+
+      // Ajustes visuales
+      el.fontSizeInput.addEventListener('input', (e) => {
+        state.settings.fontSize = parseFloat(e.target.value);
+        el.fontSizeVal.textContent = `${state.settings.fontSize} pt`;
+        saveSettings();
+        updatePreview();
+      });
+
+      el.opacityInput.addEventListener('input', (e) => {
+        state.settings.opacity = parseInt(e.target.value, 10);
+        el.opacityVal.textContent = `${state.settings.opacity}%`;
+        saveSettings();
+        updatePreview();
+      });
+
+      el.lineSpacingInput.addEventListener('input', (e) => {
+        state.settings.lineSpacing = parseFloat(e.target.value);
+        el.lineSpacingVal.textContent = state.settings.lineSpacing.toString().replace('.', ',');
+        saveSettings();
+        updatePreview();
+      });
+
+      el.colorSelect.addEventListener('change', (e) => {
+        state.settings.color = e.target.value;
+        saveSettings();
+        updatePreview();
+      });
+
+      el.resetSettingsBtn.addEventListener('click', () => {
+        state.settings = {
+          fontSize: 17,
+          opacity: 18,
+          lineSpacing: 1.5,
+          angle: 45,
+          color: 'slate'
+        };
+        syncSettingsControls();
+        saveSettings();
+        updatePreview();
+        showToast('Valores sugeridos restaurados.', 'info');
+      });
+
+      // Selectores de vista previa
+      el.previewDocSelect.addEventListener('change', (e) => {
+        state.previewDocId = e.target.value;
+        renderLoadedFilesList();
+        updatePreview();
+      });
+
+      el.previewCodeSelect.addEventListener('change', (e) => {
+        state.previewRecipientId = e.target.value;
+        renderRecipientsList();
+        updatePreview();
+      });
+
+      // Botones de descarga
+      el.generateZipBtn.addEventListener('click', () => generateWatermarkedPdfs('zip'));
+      el.generateIndividualBtn.addEventListener('click', () => generateWatermarkedPdfs('individual'));
+
+      el.redownloadZipBtn.addEventListener('click', () => {
+        if (state.lastZipUrl && state.lastZipName) {
+          triggerDownload(state.lastZipUrl, state.lastZipName);
+        }
+      });
+
+      // Modal de resultados generados
+      el.openResultsModalBtn.addEventListener('click', () => el.resultsModal.classList.remove('hidden'));
+      el.closeResultsModalBtn.addEventListener('click', () => el.resultsModal.classList.add('hidden'));
+      el.doneResultsModalBtn.addEventListener('click', () => el.resultsModal.classList.add('hidden'));
+
+      // Reajustar vista previa cuando cambia el tamaño de ventana
+      window.addEventListener('resize', () => {
+        updatePreview();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedData();
+      syncSettingsControls();
+      renderRecipientsList();
+      bindEvents();
+      requestAnimationFrame(() => updatePreview());
+    });
+  </script>
+</body>
+</html>

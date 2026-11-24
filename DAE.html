@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>División Análisis Estratégico | C.I.C.O. — Policía de la Provincia de Santa Fe</title>
+    <meta name="description" content="Identidad institucional de la División Análisis Estratégico, dependiente del Departamento Análisis Criminal (C.I.C.O.) - Dirección General Central Ojo - Policía de la Provincia de Santa Fe.">
+    
+    <!-- Carga de Tailwind CSS para diseño moderno y adaptable -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tipografía Inter de Google Fonts para máxima legibilidad institucional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Configuración personalizada de colores institucionales en Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        institucional: {
+                            950: '#07111F',
+                            900: '#0B192C', // Azul marino profundo principal
+                            800: '#102A43', // Azul marino secundario
+                            700: '#1E3A5F',
+                            600: '#2B4C7E',
+                            celeste: '#0284C7', // Acento celeste institucional
+                            celesteClaro: '#38BDF8',
+                            dorado: '#B45309', // Acento dorado/ámbar institucional sutil
+                            doradoClaro: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos base y patrones sutiles de fondo */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1E293B;
+            background-color: #F8FAFC;
+        }
+
+        /* Patrón de grilla cartográfica sutil para el encabezado institucional */
+        .bg-grid-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+            background-size: 36px 36px;
+        }
+
+        /* Transición suave para tarjetas interactivas */
+        .card-hover {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -8px rgba(11, 25, 44, 0.12);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-institucional-celeste selection:text-white">
+
+    <!-- =====================================================================
+         1. BARRA DE NAVEGACIÓN SUPERIOR (NAVBAR)
+         Fija en la parte superior con menú adaptable para móviles y computadoras
+         ===================================================================== -->
+    <header class="sticky top-0 z-50 bg-institucional-900/95 backdrop-blur-md border-b border-slate-800 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                
+                <!-- Identificador Institucional (Logo SVG + Nombre de la División) -->
+                <a href="#inicio" class="flex items-center gap-3 group focus:outline-none">
+                    <div class="w-10 h-10 rounded-lg bg-institucional-800 border border-institucional-celeste/40 flex items-center justify-center shadow-inner group-hover:border-institucional-celesteClaro transition-colors">
+                        <!-- Escudo / Ícono Geométrico de Análisis Estratégico -->
+                        <svg class="w-6 h-6 text-institucional-celesteClaro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <circle cx="12" cy="11" r="2.5"/>
+                            <path d="M12 6.5v2"/>
+                            <path d="M12 13.5v2"/>
+                            <path d="M7.5 11h2"/>
+                            <path d="M14.5 11h2"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm sm:text-base tracking-tight text-white leading-tight">
+                            División Análisis Estratégico
+                        </span>
+                        <span class="text-[11px] text-slate-300 font-medium tracking-wide uppercase">
+                            C.I.C.O. · Central "Ojo" · Santa Fe
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Enlaces de Navegación (Escritorio) -->
+                <nav class="hidden lg:flex items-center space-x-1" aria-label="Navegación principal">
+                    <a href="#sobre-la-division" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-white hover:bg-institucional-800 transition-colors">
+                        Sobre la División
+                    </a>
+                    <a href="#capacidades" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-white hover:bg-institucional-800 transition-colors">
+                        Conocimientos y Habilidades
+                    </a>
+                    <a href="#estructura-proyectos" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-white hover:bg-institucional-800 transition-colors">
+                        Estructura y Proyectos
+                    </a>
+                    <a href="#intereses" class="px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:text-white hover:bg-institucional-800 transition-colors">
+                        Intereses
+                    </a>
+                    <a href="#contacto" class="ml-2 px-4 py-2 rounded-lg text-sm font-semibold bg-institucional-celeste hover:bg-sky-500 text-white shadow-sm transition-colors">
+                        Contacto
+                    </a>
+                </nav>
+
+                <!-- Botón Menú Hamburguesa (Móviles y Tablets) -->
+                <div class="flex lg:hidden">
+                    <button id="mobile-menu-btn" type="button" class="p-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-institucional-800 focus:outline-none focus:ring-2 focus:ring-institucional-celesteClaro" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú de navegación">
+                        <svg id="menu-icon-open" class="w-6 h-6 block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú Desplegable Móvil -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-institucional-900 border-t border-slate-800 px-4 pt-2 pb-5 space-y-1.5 shadow-xl">
+            <a href="#sobre-la-division" class="mobile-nav-link block px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-institucional-800">
+                Sobre la División
+            </a>
+            <a href="#capacidades" class="mobile-nav-link block px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-institucional-800">
+                Conocimientos y Habilidades
+            </a>
+            <a href="#estructura-proyectos" class="mobile-nav-link block px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-institucional-800">
+                Estructura y Proyectos
+            </a>
+            <a href="#intereses" class="mobile-nav-link block px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-institucional-800">
+                Intereses
+            </a>
+            <a href="#contacto" class="mobile-nav-link block px-4 py-3 rounded-lg text-base font-semibold bg-institucional-celeste text-white text-center mt-2">
+                Contacto Institucional
+            </a>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         2. PRESENTACIÓN PRINCIPAL (HERO SECTION)
+         Identidad institucional, dependencia orgánica y frase representativa
+         ===================================================================== -->
+    <section id="inicio" class="relative bg-gradient-to-br from-institucional-950 via-institucional-900 to-institucional-800 text-white overflow-hidden">
+        <!-- Patrón técnico de fondo -->
+        <div class="absolute inset-0 bg-grid-pattern pointer-events-none"></div>
+        <!-- Resplandor sutil superior derecho -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-institucional-celeste/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-28">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Columna Izquierda: Textos Principales -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- Etiqueta Jerárquica Superior -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-institucional-800/90 border border-institucional-celeste/30 text-xs sm:text-sm font-medium text-institucional-celesteClaro">
+                        <span class="w-2 h-2 rounded-full bg-institucional-celesteClaro animate-pulse"></span>
+                        <span>Ministerio de Justicia y Seguridad · Policía de la Provincia de Santa Fe</span>
+                    </div>
+
+                    <!-- Título Principal (H1) -->
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
+                        División Análisis Estratégico
+                    </h1>
+
+                    <!-- Subtítulo de Dependencia Orgánica -->
+                    <p class="text-base sm:text-lg font-medium text-amber-300/95 border-l-2 border-institucional-doradoClaro pl-4">
+                        Departamento Análisis Criminal · Subdirección de Central de Información Criminal Operativa (C.I.C.O.) · Dirección General Central "Ojo"
+                    </p>
+
+                    <!-- Frase Representativa / Síntesis de Misión -->
+                    <p class="text-slate-200 text-base sm:text-lg leading-relaxed max-w-2xl">
+                        Centralizar, sistematizar y analizar la información criminal provincial para producir conclusiones útiles en el marco de la gestión de estrategias policiales de prevención del delito.
+                    </p>
+
+                    <!-- Botones de Acción Funcionales -->
+                    <div class="pt-2 flex flex-col sm:flex-row gap-3.5">
+                        <a href="#sobre-la-division" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-institucional-celeste hover:bg-sky-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-sky-950/50 transition-all">
+                            <span>Conocer la División</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </a>
+                        <a href="#contacto" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-institucional-800/80 hover:bg-institucional-700 text-slate-100 border border-slate-600/80 font-semibold text-sm sm:text-base transition-all">
+                            <svg class="w-4 h-4 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span>Contacto Institucional</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Gráfico SVG Institucional de Análisis Estratégico y Redes de Información -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="w-full max-w-md bg-institucional-900/80 border border-slate-700/70 rounded-2xl p-6 shadow-2xl backdrop-blur-sm">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Síntesis Operativa</span>
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded bg-institucional-800 text-institucional-celesteClaro border border-institucional-celeste/30">Decreto N.º 0224/2019</span>
+                        </div>
+
+                        <!-- Ilustración Vectorial SVG: Nodo Central de Análisis Criminal -->
+                        <svg class="w-full h-52 my-2" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama esquemático de integración de datos criminales">
+                            <!-- Anillos concéntricos de radar/análisis -->
+                            <circle cx="200" cy="110" r="88" stroke="#1E3A5F" stroke-width="1" stroke-dasharray="4 4"/>
+                            <circle cx="200" cy="110" r="58" stroke="#0284C7" stroke-opacity="0.35" stroke-width="1.2"/>
+                            <circle cx="200" cy="110" r="28" fill="#102A43" stroke="#38BDF8" stroke-width="2"/>
+
+                            <!-- Líneas de conexión hacia fuentes y estamentos -->
+                            <line x1="80" y1="45" x2="175" y2="95" stroke="#38BDF8" stroke-opacity="0.5" stroke-width="1.5"/>
+                            <line x1="320" y1="45" x2="225" y2="95" stroke="#38BDF8" stroke-opacity="0.5" stroke-width="1.5"/>
+                            <line x1="80" y1="175" x2="175" y2="125" stroke="#D97706" stroke-opacity="0.6" stroke-width="1.5"/>
+                            <line x1="320" y1="175" x2="225" y2="125" stroke="#38BDF8" stroke-opacity="0.5" stroke-width="1.5"/>
+
+                            <!-- Nodos Periféricos -->
+                            <!-- Nodo 1: SIACIP -->
+                            <rect x="24" y="26" width="84" height="30" rx="6" fill="#0B192C" stroke="#38BDF8" stroke-width="1.2"/>
+                            <text x="66" y="45" fill="#E2E8F0" font-size="11" font-weight="600" text-anchor="middle">SIACIP</text>
+
+                            <!-- Nodo 2: KNIME / HORUS -->
+                            <rect x="284" y="26" width="96" height="30" rx="6" fill="#0B192C" stroke="#38BDF8" stroke-width="1.2"/>
+                            <text x="332" y="45" fill="#E2E8F0" font-size="11" font-weight="600" text-anchor="middle">KNIME / HORUS</text>
+
+                            <!-- Nodo 3: Carácter Consultivo -->
+                            <rect x="20" y="162" width="96" height="30" rx="6" fill="#0B192C" stroke="#D97706" stroke-width="1.2"/>
+                            <text x="68" y="181" fill="#FDE68A" font-size="10.5" font-weight="600" text-anchor="middle">CONSULTIVO</text>
+
+                            <!-- Nodo 4: Prevención -->
+                            <rect x="284" y="162" width="96" height="30" rx="6" fill="#0B192C" stroke="#38BDF8" stroke-width="1.2"/>
+                            <text x="332" y="181" fill="#E2E8F0" font-size="10.5" font-weight="600" text-anchor="middle">PREVENCIÓN</text>
+
+                            <!-- Ícono Central: Ojo / Estrategia -->
+                            <path d="M186 110C189.5 103.5 194.5 100.5 200 100.5C205.5 100.5 210.5 103.5 214 110C210.5 116.5 205.5 119.5 200 119.5C194.5 119.5 189.5 116.5 186 110Z" stroke="#38BDF8" stroke-width="1.8"/>
+                            <circle cx="200" cy="110" r="3.5" fill="#38BDF8"/>
+                        </svg>
+
+                        <!-- Indicadores clave reales -->
+                        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800 text-center">
+                            <div class="p-2 rounded-lg bg-institucional-950/60">
+                                <span class="block text-lg font-bold text-white">18</span>
+                                <span class="text-[11px] text-slate-400">Integrantes</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-institucional-950/60">
+                                <span class="block text-lg font-bold text-institucional-celesteClaro">4</span>
+                                <span class="text-[11px] text-slate-400">Estamentos</span>
+                            </div>
+                            <div class="p-2 rounded-lg bg-institucional-950/60">
+                                <span class="block text-lg font-bold text-amber-400">100%</span>
+                                <span class="text-[11px] text-slate-400">Preventivo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         3. SECCIÓN: SOBRE LA DIVISIÓN
+         Misión Oficial, Inserción Orgánica, Articulación y Reglas de Oro Legales
+         ===================================================================== -->
+    <section id="sobre-la-division" class="py-16 md:py-24 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Encabezado de Sección -->
+            <div class="max-w-3xl mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-institucional-celeste">Identidad y Marco Normativo</span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-bold text-institucional-900 tracking-tight">
+                    Sobre la División Análisis Estratégico
+                </h2>
+                <div class="mt-3 w-16 h-1 bg-institucional-doradoClaro rounded-full"></div>
+            </div>
+
+            <!-- Bloque 1: Misión Oficial Destacada -->
+            <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-sm mb-10">
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="w-12 h-12 rounded-xl bg-institucional-900 text-institucional-celesteClaro flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-bold text-institucional-900 mb-3">
+                            Misión Oficial
+                        </h3>
+                        <p class="text-slate-700 text-base sm:text-lg leading-relaxed">
+                            “Centralizar, sistematizar y analizar la información criminal provincial disponible de componentes policiales y de comandos conjuntos de complementación o crisis, procurando su valoración e integración con otras bases de datos disponibles, a fin de producir conclusiones útiles en el marco de la gestión de estrategias policiales de prevención del delito.”
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloque 2: Inserción Orgánica y Articulación Funcional -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
+                <!-- Dependencia Orgánica -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 rounded-md text-xs font-bold bg-institucional-900 text-white">Decreto N.º 0224/2019</span>
+                        <h3 class="text-lg font-bold text-institucional-900">Dependencia Orgánica</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                        La División Análisis Estratégico es un destino policial subordinado al <strong>Departamento de Análisis Criminal</strong>, dentro de la <strong>Subdirección de Central de Información Criminal Operativa (C.I.C.O.)</strong> de la <strong>Dirección General Central "Ojo"</strong>.
+                    </p>
+                </div>
+
+                <!-- Articulación Funcional (U.A.I.C.) -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 rounded-md text-xs font-bold bg-institucional-celeste text-white">Orden de Op. N.º 001/2024</span>
+                        <h3 class="text-lg font-bold text-institucional-900">Articulación Funcional (U.A.I.C.)</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                        Mediante la Orden de Operaciones N.º 001/2024 y la Directiva General de la División, se encuadra el funcionamiento del dispositivo <strong>Unidad de Análisis de Inteligencia Criminal (U.A.I.C.)</strong>, manteniendo una articulación funcional directa con la <strong>Subsecretaría de Inteligencia Criminal</strong> sin modificar su dependencia orgánica policial.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bloque 3: Reglas de Oro Legales y Límites de Actuación -->
+            <div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-institucional-900">
+                            Reglas de Oro Legales y Límites de Actuación
+                        </h3>
+                        <p class="text-sm text-slate-600 mt-1">
+                            Principios rectores de legalidad, objetividad y respeto irrestricto a las garantías constitucionales.
+                        </p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-50 text-institucional-dorado border border-amber-200 self-start sm:self-auto">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Cumplimiento Estricto
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Regla 1 -->
+                    <div class="bg-slate-50 border-t-4 border-t-institucional-900 border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <div class="w-10 h-10 rounded-lg bg-institucional-900/10 text-institucional-900 flex items-center justify-center font-bold text-base mb-4">
+                            01
+                        </div>
+                        <h4 class="text-base font-bold text-institucional-900 mb-2">
+                            Carácter Consultivo y No Vinculante
+                        </h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Todos los informes, mapas, alertas y reportes elaborados por la División son estrictamente consultivos, orientativos y no vinculantes. No constituyen órdenes operativas ni determinaciones definitivas de hechos.
+                        </p>
+                    </div>
+
+                    <!-- Regla 2 -->
+                    <div class="bg-slate-50 border-t-4 border-t-institucional-celeste border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <div class="w-10 h-10 rounded-lg bg-institucional-celeste/10 text-institucional-celeste flex items-center justify-center font-bold text-base mb-4">
+                            02
+                        </div>
+                        <h4 class="text-base font-bold text-institucional-900 mb-2">
+                            Prohibición de Uso Probatorio Directo
+                        </h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            La División no realiza tareas de investigación judicial. Sus productos orientan la prevención del delito y, subsidiariamente, las etapas iniciales de la investigación, pero en ningún caso deben ser utilizados como evidencia directa en el proceso penal acusatorio.
+                        </p>
+                    </div>
+
+                    <!-- Regla 3 -->
+                    <div class="bg-slate-50 border-t-4 border-t-institucional-doradoClaro border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-institucional-dorado flex items-center justify-center font-bold text-base mb-4">
+                            03
+                        </div>
+                        <h4 class="text-base font-bold text-institucional-900 mb-2">
+                            Exclusiones Absolutas (Leyes N.º 14.246 y 13.164)
+                        </h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Queda terminantemente prohibido recabar, analizar o almacenar información sobre personas o grupos fundamentada exclusivamente en su origen étnico, afiliaciones religiosas o políticas, hábitos personales no delictivos, o asociaciones con personas que no presenten características delictivas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         4. SECCIÓN: CONOCIMIENTOS Y HABILIDADES
+         Capacidades técnicas, metodologías y herramientas de análisis
+         ===================================================================== -->
+    <section id="capacidades" class="py-16 md:py-24 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="max-w-3xl mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-institucional-celeste">Competencias Técnicas</span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-bold text-institucional-900 tracking-tight">
+                    Conocimientos y Habilidades del Área
+                </h2>
+                <p class="mt-3 text-slate-600 text-base">
+                    Metodologías analíticas, procesamiento automatizado y herramientas tecnológicas aplicadas a la sistematización de la información criminal.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                
+                <!-- Habilidad 1 -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm card-hover flex gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-institucional-900 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                            Análisis Delictual y Estadística Criminal
+                        </h3>
+                        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                            Sistematización, valoración e integración de información criminal proveniente de componentes policiales y comandos conjuntos de complementación o crisis para detectar patrones, tendencias y dinámicas delictivas.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Habilidad 2 -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm card-hover flex gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-institucional-900 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                            Georreferenciación y Análisis Territorial (SIG)
+                        </h3>
+                        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                            Elaboración de cartografía temática, análisis espacial de incidencias priorizadas y estudio territorial de puntos de venta de estupefacientes (PVE) y economías ilegales (Ley N.º 14.239).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Habilidad 3 -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm card-hover flex gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-institucional-900 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                            Minería y Procesamiento Automatizado de Datos
+                        </h3>
+                        <p class="text-sm sm:text-base text-slate-600 leading-relaxed mb-3">
+                            Ingesta diaria, depuración y cruce estructurado de reportes ciudadanos (0800 / 911) e incidencias priorizadas mediante plataformas especializadas.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-institucional-900 border border-slate-300">SIACIP</span>
+                            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-institucional-900 border border-slate-300">KNIME</span>
+                            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-institucional-900 border border-slate-300">HORUS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habilidad 4 -->
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm card-hover flex gap-5">
+                    <div class="w-12 h-12 rounded-xl bg-institucional-900 text-white flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                            Productos de Inteligencia Estratégica
+                        </h3>
+                        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                            Redacción técnica de informes temáticos y de contexto, seguimiento de audiencias (OGJ), egresos penitenciarios, análisis de barras bravas, reportes al Servicio Penitenciario (SP) y caracterización multicriterio de prófugos de alto perfil.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         5. SECCIÓN: ESTRUCTURA OPERATIVA, EXPERIENCIA Y PROYECTOS RELEVANTES
+         Distribución orgánica de 18 integrantes (con filtro interactivo) + Ejes de Gestión
+         ===================================================================== -->
+    <section id="estructura-proyectos" class="py-16 md:py-24 bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Encabezado -->
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold uppercase tracking-widest text-institucional-celeste">Organización y Despliegue</span>
+                    <h2 class="mt-2 text-2xl sm:text-3xl font-bold text-institucional-900 tracking-tight">
+                        Estructura Interna, Experiencia y Proyectos
+                    </h2>
+                    <p class="mt-3 text-slate-600 text-base">
+                        La División opera con una dotación total de <strong>18 integrantes</strong> organizados en cuatro estamentos funcionales especializados.
+                    </p>
+                </div>
+
+                <!-- Filtros Interactivos de Estamentos (JavaScript funcional) -->
+                <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar estamentos operativos">
+                    <button type="button" data-filter="todos" class="estamento-filter-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-institucional-900 text-white shadow-sm transition-colors">
+                        Todos (18)
+                    </button>
+                    <button type="button" data-filter="jefatura" class="estamento-filter-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        Jefatura (2)
+                    </button>
+                    <button type="button" data-filter="uaic" class="estamento-filter-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        U.A.I.C. (10)
+                    </button>
+                    <button type="button" data-filter="diprocace" class="estamento-filter-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        DIPROCACE (5)
+                    </button>
+                    <button type="button" data-filter="dacap" class="estamento-filter-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+                        D.A.C.A.P. (1)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid de los 4 Estamentos Funcionales -->
+            <div id="estamentos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+                
+                <!-- Estamento 1: Jefatura y Subjefatura -->
+                <div data-estamento="jefatura" class="estamento-card bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-institucional-dorado">Conducción</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-institucional-900 mt-0.5">
+                                Jefatura y Subjefatura
+                            </h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-institucional-900 text-white shrink-0">
+                            2 Efectivos
+                        </span>
+                    </div>
+                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                        Conducción operativa de la División, supervisión técnica de los equipos de análisis, validación metodológica y control definitivo de todos los productos previos a su despacho institucional.
+                    </p>
+                </div>
+
+                <!-- Estamento 2: U.A.I.C. -->
+                <div data-estamento="uaic" class="estamento-card bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-institucional-celeste">Unidad de Análisis de Inteligencia Criminal</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-institucional-900 mt-0.5">
+                                U.A.I.C.
+                            </h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-institucional-celeste text-white shrink-0">
+                            10 Efectivos
+                        </span>
+                    </div>
+                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                        Lectura permanente de incidencias priorizadas (SIACIP), elaboración de informes temáticos y de contexto, análisis de audiencias (OGJ), detenidos, egresos penitenciarios, análisis de barras bravas y reportes al Servicio Penitenciario (SP).
+                    </p>
+                </div>
+
+                <!-- Estamento 3: DIPROCACE -->
+                <div data-estamento="diprocace" class="estamento-card bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-institucional-celeste">Producción de Información sobre Estupefacientes</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-institucional-900 mt-0.5">
+                                DIPROCACE
+                            </h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-institucional-celeste text-white shrink-0">
+                            5 Efectivos
+                        </span>
+                    </div>
+                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                        Ingesta diaria de llamadas (0800 / 911) mediante flujos de procesamiento en KNIME y HORUS, análisis territorial de puntos de venta de estupefacientes (PVE) y economías ilegales en el marco de la Ley N.º 14.239.
+                    </p>
+                </div>
+
+                <!-- Estamento 4: D.A.C.A.P. -->
+                <div data-estamento="dacap" class="estamento-card bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-institucional-dorado">Capturas de Alto Perfil</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-institucional-900 mt-0.5">
+                                D.A.C.A.P.
+                            </h3>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-institucional-900 text-white shrink-0">
+                            1 Efectivo
+                        </span>
+                    </div>
+                    <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                        Identificación, caracterización multicriterio y análisis de localización de prófugos de alto perfil bajo directivas específicas de la Subsecretaría de Inteligencia Criminal (Resolución N.º 1772/2025).
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Subsección: Ejes de Experiencia y Proyectos Relevantes -->
+            <div class="bg-institucional-900 rounded-2xl p-6 sm:p-10 text-white shadow-lg">
+                <div class="mb-8">
+                    <span class="text-xs font-bold uppercase tracking-widest text-institucional-celesteClaro">Líneas de Gestión</span>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-bold text-white">
+                        Experiencia Operativa y Proyectos Relevantes
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Proyecto 1 -->
+                    <div class="bg-institucional-800/80 border border-slate-700/80 rounded-xl p-5">
+                        <div class="text-institucional-celesteClaro font-bold text-sm mb-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-institucional-celesteClaro"></span>
+                            Flujos de Datos Automatizados
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Implementación y mejora continua de procesos diarios de ingesta, limpieza y sistematización de reportes ciudadanos (0800/911) e incidencias priorizadas utilizando SIACIP, KNIME y HORUS.
+                        </p>
+                    </div>
+
+                    <!-- Proyecto 2 -->
+                    <div class="bg-institucional-800/80 border border-slate-700/80 rounded-xl p-5">
+                        <div class="text-institucional-celesteClaro font-bold text-sm mb-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-institucional-celesteClaro"></span>
+                            Articulación Interinstitucional
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Producción coordinada de insumos estratégicos entre la Dirección General Central "Ojo" (C.I.C.O.), la Subsecretaría de Inteligencia Criminal, el Servicio Penitenciario (SP) y la Oficina de Gestión Judicial (OGJ).
+                        </p>
+                    </div>
+
+                    <!-- Proyecto 3 -->
+                    <div class="bg-institucional-800/80 border border-slate-700/80 rounded-xl p-5">
+                        <div class="text-amber-400 font-bold text-sm mb-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            Adecuación Normativa y Técnica
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Estandarización de protocolos internos de actuación conforme al Decreto N.º 0224/2019, Leyes N.º 14.246, 13.164, 14.239, Orden de Operaciones N.º 001/2024 y Resolución N.º 1772/2025.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         6. SECCIÓN: INTERESES PROFESIONALES
+         Áreas de desarrollo, estudio e innovación institucional
+         ===================================================================== -->
+    <section id="intereses" class="py-16 md:py-24 bg-slate-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="max-w-3xl mb-12">
+                <span class="text-xs font-bold uppercase tracking-widest text-institucional-celeste">Proyección Institucional</span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-bold text-institucional-900 tracking-tight">
+                    Intereses Profesionales
+                </h2>
+                <p class="mt-3 text-slate-600 text-base">
+                    Ejes de interés técnico y mejora continua orientados a fortalecer la calidad analítica y preventiva de la División.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Interés 1 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-sky-50 text-institucional-celeste flex items-center justify-center mb-5 border border-sky-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                        Fenómenos Criminales Complejos
+                    </h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Profundización en el análisis contextual de economías ilegales, dinámicas territoriales vinculadas al narcomenudeo y factores de riesgo asociados a la violencia urbana.
+                    </p>
+                </div>
+
+                <!-- Interés 2 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-sky-50 text-institucional-celeste flex items-center justify-center mb-5 border border-sky-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                        Ciencia de Datos Aplicada a la Prevención
+                    </h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Optimización de flujos de integración de datos, visualización geoespacial avanzada y metodologías de análisis prospectivo para asistir la toma de decisiones preventivas.
+                    </p>
+                </div>
+
+                <!-- Interés 3 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-amber-50 text-institucional-dorado flex items-center justify-center mb-5 border border-amber-100">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-institucional-900 mb-2">
+                        Capacitación Continua y Profesionalización
+                    </h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Formación permanente del personal en herramientas analíticas, estándares de calidad de la información y actualización sobre el marco legal provincial y nacional vigente.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         7. SECCIÓN: CONTACTO INSTITUCIONAL
+         Datos oficiales verificados + botones funcionales (mailto y copiar correo)
+         ===================================================================== -->
+    <section id="contacto" class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="bg-gradient-to-br from-institucional-900 to-institucional-800 rounded-3xl p-6 sm:p-10 lg:p-12 text-white shadow-xl border border-slate-700/60">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    
+                    <!-- Columna Izquierda: Información Institucional -->
+                    <div class="lg:col-span-7 space-y-5">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-institucional-celeste/20 text-institucional-celesteClaro border border-institucional-celeste/30">
+                            Canales Institucionales
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                            Contacto Institucional
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Para consultas institucionales, articulación interinstitucional o requerimientos en el marco de las competencias consultivas de la División Análisis Estratégico:
+                        </p>
+
+                        <!-- Lista de Datos Verificados -->
+                        <dl class="space-y-4 pt-2">
+                            <!-- Dependencia -->
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-lg bg-institucional-950/70 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Dependencia Orgánica</dt>
+                                    <dd class="text-sm sm:text-base font-medium text-white mt-0.5">
+                                        División Análisis Estratégico · Departamento Análisis Criminal (C.I.C.O.) · Dirección General Central "Ojo"
+                                    </dd>
+                                    <dd class="text-xs sm:text-sm text-slate-300">
+                                        Policía de la Provincia de Santa Fe · Ministerio de Justicia y Seguridad
+                                    </dd>
+                                </div>
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-lg bg-institucional-950/70 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Correo Electrónico Oficial</dt>
+                                    <dd class="text-base sm:text-lg font-semibold text-institucional-celesteClaro mt-0.5 break-all">
+                                        ipminseg.cico@santafe.gov.ar
+                                    </dd>
+                                </div>
+                            </div>
+
+                            <!-- Teléfono / Interno (Identificado claramente como pendiente) -->
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-lg bg-institucional-950/70 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Teléfono / Interno Institucional</dt>
+                                    <dd class="text-sm text-amber-300/90 italic mt-0.5">
+                                        [Pendiente de configuración]
+                                    </dd>
+                                </div>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-lg bg-institucional-950/70 border border-slate-700 flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-semibold uppercase tracking-wider text-slate-400">Jurisdicción y Sede</dt>
+                                    <dd class="text-sm text-slate-200 mt-0.5">
+                                        Provincia de Santa Fe, República Argentina · <span class="text-amber-300/90 italic">[Dirección específica pendiente de configuración]</span>
+                                    </dd>
+                                </div>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <!-- Columna Derecha: Tarjeta de Acción Directa -->
+                    <div class="lg:col-span-5">
+                        <div class="bg-institucional-950/80 border border-slate-700 rounded-2xl p-6 sm:p-8 space-y-5">
+                            <h3 class="text-lg font-bold text-white">
+                                Comunicación Directa por Correo
+                            </h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">
+                                Puede redactar un correo electrónico directamente desde su cliente habitual o copiar la dirección institucional al portapapeles.
+                            </p>
+
+                            <!-- Botón 1: Abrir cliente de correo real -->
+                            <a href="mailto:ipminseg.cico@santafe.gov.ar?subject=Consulta%20Institucional%20-%20Divisi%C3%B3n%20An%C3%A1lisis%20Estrat%C3%A9gico" class="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl bg-institucional-celeste hover:bg-sky-500 text-white font-semibold text-sm shadow-md transition-all">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>Enviar Correo Electrónico</span>
+                            </a>
+
+                            <!-- Botón 2: Copiar correo al portapapeles con confirmación visual -->
+                            <button id="copy-email-btn" type="button" data-email="ipminseg.cico@santafe.gov.ar" class="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl bg-institucional-800 hover:bg-institucional-700 text-slate-100 border border-slate-600 font-semibold text-sm transition-all">
+                                <svg id="copy-icon" class="w-4 h-4 text-institucional-celesteClaro" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                <span id="copy-btn-text">Copiar Dirección de Correo</span>
+                            </button>
+
+                            <!-- Mensaje de confirmación accesible (oculto por defecto) -->
+                            <div id="copy-feedback" role="status" aria-live="polite" class="hidden text-center text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-700/60 rounded-lg py-2 px-3">
+                                ✓ Dirección copiada: ipminseg.cico@santafe.gov.ar
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         8. PIE DE PÁGINA INSTITUCIONAL (FOOTER)
+         ===================================================================== -->
+    <footer class="bg-institucional-950 text-slate-400 border-t border-slate-800 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-slate-800/80">
+                <div>
+                    <p class="text-white font-bold text-base">
+                        División Análisis Estratégico
+                    </p>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                        Departamento Análisis Criminal · Subdirección C.I.C.O. · Dirección General Central "Ojo"
+                    </p>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Policía de la Provincia de Santa Fe · Ministerio de Justicia y Seguridad
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-4 text-xs sm:text-sm">
+                    <a href="#inicio" class="hover:text-white transition-colors">Inicio</a>
+                    <a href="#sobre-la-division" class="hover:text-white transition-colors">Sobre la División</a>
+                    <a href="#capacidades" class="hover:text-white transition-colors">Capacidades</a>
+                    <a href="#estructura-proyectos" class="hover:text-white transition-colors">Estructura</a>
+                    <a href="#contacto" class="hover:text-white transition-colors">Contacto</a>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs text-slate-500">
+                <p>
+                    Nota Legal: Los productos elaborados por esta División poseen carácter estrictamente consultivo, orientativo y no vinculante (Decreto N.º 0224/2019 · Leyes N.º 14.246 y 13.164).
+                </p>
+                <p class="shrink-0 text-slate-400">
+                    Provincia de Santa Fe, Argentina
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =====================================================================
+         JAVASCRIPT FUNCIONAL (SOLO LO NECESARIO Y SIN DEPENDENCIAS EXTERNAS)
+         1. Menú móvil desplegable
+         2. Filtro interactivo de estamentos operativos (18 integrantes)
+         3. Copiado real del correo institucional al portapapeles
+         ===================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // 1. Control del menú hamburguesa en dispositivos móviles
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('menu-icon-open');
+            const iconClose = document.getElementById('menu-icon-close');
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+
+            function toggleMobileMenu() {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                if (isHidden) {
+                    mobileMenu.classList.remove('hidden');
+                    iconOpen.classList.add('hidden');
+                    iconClose.classList.remove('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'true');
+                } else {
+                    mobileMenu.classList.add('hidden');
+                    iconOpen.classList.remove('hidden');
+                    iconClose.classList.add('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            }
+
+            // Cerrar menú móvil automáticamente al seleccionar una sección
+            mobileLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        toggleMobileMenu();
+                    }
+                });
+            });
+
+            // 2. Filtro interactivo para los 4 estamentos operativos de la División
+            const filterButtons = document.querySelectorAll('.estamento-filter-btn');
+            const estamentoCards = document.querySelectorAll('.estamento-card');
+
+            filterButtons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const selectedFilter = btn.getAttribute('data-filter');
+
+                    // Actualizar estilos visuales de los botones de filtro
+                    filterButtons.forEach(function (b) {
+                        b.classList.remove('bg-institucional-900', 'text-white', 'shadow-sm');
+                        b.classList.add('bg-slate-100', 'text-slate-700');
+                    });
+                    btn.classList.remove('bg-slate-100', 'text-slate-700');
+                    btn.classList.add('bg-institucional-900', 'text-white', 'shadow-sm');
+
+                    // Mostrar u ocultar las tarjetas según el filtro elegido
+                    estamentoCards.forEach(function (card) {
+                        const cardType = card.getAttribute('data-estamento');
+                        if (selectedFilter === 'todos' || selectedFilter === cardType) {
+                            card.classList.remove('hidden');
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // 3. Funcionalidad real para copiar el correo electrónico institucional
+            const copyEmailBtn = document.getElementById('copy-email-btn');
+            const copyBtnText = document.getElementById('copy-btn-text');
+            const copyFeedback = document.getElementById('copy-feedback');
+
+            if (copyEmailBtn) {
+                copyEmailBtn.addEventListener('click', function () {
+                    const emailToCopy = copyEmailBtn.getAttribute('data-email');
+                    
+                    // Uso de textarea temporal compatible con todos los navegadores e iframes
+                    const tempInput = document.createElement('textarea');
+                    tempInput.value = emailToCopy;
+                    tempInput.style.position = 'fixed';
+                    tempInput.style.opacity = '0';
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        copyBtnText.textContent = '¡Correo Copiado!';
+                        copyFeedback.classList.remove('hidden');
+
+                        // Restaurar texto original tras 3 segundos
+                        setTimeout(function () {
+                            copyBtnText.textContent = 'Copiar Dirección de Correo';
+                            copyFeedback.classList.add('hidden');
+                        }, 3000);
+                    } catch (err) {
+                        copyBtnText.textContent = 'ipminseg.cico@santafe.gov.ar';
+                    } finally {
+                        document.body.removeChild(tempInput);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
